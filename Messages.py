@@ -2,10 +2,7 @@ import imaplib
 import email
 from email.header import decode_header
 from msilib.schema import Error
-from types import NoneType
-import webbrowser
 import os
-import sys
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
