@@ -1,0 +1,3 @@
+columns = ['Delivered-To', 'Received', 'X-Google-Smtp-Source', 'X-Received', 'ARC-Seal', 'ARC-Message-Signature', 'ARC-Authentication-Results', 'Return-Path', 'Received', 'Received-SPF', 'Authentication-Results', 'DKIM-Signature', 'DKIM-Signature', 'From', 'To', 'Subject','Cc', 'MIME-Version', 'Content-Type', 'Content-Transfer-Encoding', 'Message-ID', 'Date', 'Feedback-ID', 'X-SES-Outgoing']
+
+print(len(columns))
