@@ -2,7 +2,10 @@ import imaplib
 import email
 from email.header import decode_header
 from msilib.schema import Error
+from types import NoneType
+import webbrowser
 import os
+import sys
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,12 +13,12 @@ load_dotenv()
 # account credentials
 username = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
-imap_server = os.getenv("IMAP_SERVER")
-
+print(username)
+print(password)
 # use your email provider's IMAP server, you can look for your provider's IMAP server on Google
 # or check this page: https://www.systoolsgroup.com/imap/
 # for office 365, it's this:
-
+imap_server = "imap.gmail.com"
 
 columns = ['Message-ID',
            'Delivered-To', 
@@ -53,7 +56,7 @@ def clean(text):
     return "".join(c if c.isalnum() else "_" for c in text)
 
 # number of top emails to fetch
-N = 1
+N = 100
 
 # create an IMAP4 class with SSL, use your email provider's IMAP server
 
@@ -61,19 +64,13 @@ N = 1
 def getMessages():
     # select a mailbox (in this case, the inbox mailbox)
     imap = imaplib.IMAP4_SSL(imap_server)
-    # authenticate    
+    # authenticate
     try:
         imap.login(username, password)
     except Exception as e:
         print(e)
-        return
-        # sys.exit(1)
-
+        sys.exit(1)
     # use imap.list() to get the list of mailboxes
-    
-    for i in imap.list()[1]:
-        print(i)
-    # return
     status, messages = imap.select("INBOX")
 
     # total number of emails
@@ -81,9 +78,9 @@ def getMessages():
 
     print("No of Messages: ",messages)
     records = []
-    for i in range(messages, 0, -1):    
+    for i in range(messages, messages-N, -1):    
         res, msg = imap.fetch(str(i), '(BODY.PEEK[])')
-        print("Getting messages no: ",str(i))
+        # print("Messages no: ",str(i))
         
         recordText = ""
 
@@ -138,7 +135,9 @@ def getMessages():
                         recordText+=text
                     except Exception as e:
                         print(e)        
-                # print(recordText)
+                # print("Time: " ,record["Date"][16:25])
+                # print("Day: " ,record["Date"][0:3])
+                # print("ShortDate: " ,record["Date"][5:16].strip())
                 record['Time'] = record["Date"][16:25]
                 record['Day'] = record["Date"][0:3]
                 record['ShortDate'] = record["Date"][5:16]
@@ -148,7 +147,6 @@ def getMessages():
 
     imap.close()
     imap.logout()
-    print("Got all the Messages")
     return records
 # (getMessages())
 # print(getMessages)

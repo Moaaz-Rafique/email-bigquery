@@ -1,62 +1,70 @@
-import datetime
 
 from google.cloud import bigquery
 import pandas
-import pytz
 import os
 from Messages import getMessages, columns
-import time
 from dotenv import load_dotenv
+import json
+
 load_dotenv()
+CREDENTIALS = {
+    "type": "service_account",
+    "project_id": os.getenv("PROJECT_ID"),
+    "private_key_id": os.getenv("PRIVATE_KEY_ID"),
+    "private_key": os.getenv("PRIVATE_KEY").replace("\\n", '\n'),
+    "client_email": os.getenv("CLIENT_EMAIL"),
+    "client_id": os.getenv("CLIENT_ID"),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": os.getenv("CLIENT_X509_CERT_URL")
+}
 
-while True:
-    try:
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "creds.json"
-        client = bigquery.Client()
+with open("creds.json", "w") as outfile:
+    json.dump(CREDENTIALS, outfile)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "creds.json"
 
-        # TODO(developer): Set table_id to the ID of the table to create.
-        table_id = os.getenv("TABLE_ID")
+try:
+    client = bigquery.Client()
+    # TODO(developer): Set table_id to the ID of the table to create.
+    table_id = os.getenv("TABLE_ID")
+    # print(columns)
 
-        # print(columns)
-
-        adjustedColumns = [i.replace("-", "") for i in columns]
-        adjustedColumns.append("MessageText")
-        print(adjustedColumns)
-
-
-        records = getMessages()
+    adjustedColumns = [i.replace("-", "") for i in columns]
+    adjustedColumns.append("MessageText")
+    print(adjustedColumns)
 
 
-        dataframe = pandas.DataFrame(
+    records = getMessages()
+
+
+    dataframe = pandas.DataFrame(
             records,
             columns=adjustedColumns,
             # index=[i['MessageID'] for i in records]
-        )
+    )
 
         # print(dataframe.columns)
 
         # dataframe.to_csv("sheesh.csv")
 
 
-        job_config = bigquery.LoadJobConfig(
+    job_config = bigquery.LoadJobConfig(
             write_disposition="WRITE_TRUNCATE",
         )
 
-        job = client.load_table_from_dataframe(    
-            dataframe, table_id,job_config
-        )  # Make an API request.
-        job.result()  # Wait for the job to complete.
+    job = client.load_table_from_dataframe(    
+            dataframe, table_id,job_config=job_config
+    )  # Make an API request.
+    job.result()  # Wait for the job to complete.
 
-        table = client.get_table(table_id)  # Make an API request.
-        print(
+    table = client.get_table(table_id)  # Make an API request.
+    print(
             "Loaded {} rows and {} columns to {}".format(
                 table.num_rows, len(table.schema), table_id
             )
         )
 
-    except Exception as e:
-        print(e)
+except Exception as e:
+    print(e)
 
-    for i in range(1 * 3 * 60 ,0,-1):
-        print(f"{int(i/60)}minutes and {i%60} seconds", end="\r", flush=True)
-        time.sleep(1)
