@@ -1,7 +1,5 @@
 import imaplib
 import email
-from email.header import decode_header
-from msilib.schema import Error
 import os
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
