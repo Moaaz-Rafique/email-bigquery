@@ -5,7 +5,7 @@ import os
 from Messages import getMessages, columns
 from dotenv import load_dotenv
 import json
-
+import time
 load_dotenv()
 CREDENTIALS = {
     "type": "service_account",
@@ -24,47 +24,54 @@ with open("creds.json", "w") as outfile:
     json.dump(CREDENTIALS, outfile)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "creds.json"
 
-try:
-    client = bigquery.Client()
-    # TODO(developer): Set table_id to the ID of the table to create.
-    table_id = os.getenv("TABLE_ID")
-    # print(columns)
+def loadEmails():
+    try:
+        client = bigquery.Client()
+        # TODO(developer): Set table_id to the ID of the table to create.
+        table_id = os.getenv("TABLE_ID")
+        # print(columns)
 
-    adjustedColumns = [i.replace("-", "") for i in columns]
-    adjustedColumns.append("MessageText")
-    print(adjustedColumns)
-
-
-    records = getMessages()
+        adjustedColumns = [i.replace("-", "") for i in columns]
+        adjustedColumns.append("MessageText")
+        print(adjustedColumns)
 
 
-    dataframe = pandas.DataFrame(
-            records,
-            columns=adjustedColumns,
-            # index=[i['MessageID'] for i in records]
-    )
-
-        # print(dataframe.columns)
-
-        # dataframe.to_csv("sheesh.csv")
+        records = getMessages()
 
 
-    job_config = bigquery.LoadJobConfig(
-            write_disposition="WRITE_TRUNCATE",
+        dataframe = pandas.DataFrame(
+                records,
+                columns=adjustedColumns,
+                # index=[i['MessageID'] for i in records]
         )
 
-    job = client.load_table_from_dataframe(    
-            dataframe, table_id,job_config=job_config
-    )  # Make an API request.
-    job.result()  # Wait for the job to complete.
+            # print(dataframe.columns)
 
-    table = client.get_table(table_id)  # Make an API request.
-    print(
-            "Loaded {} rows and {} columns to {}".format(
-                table.num_rows, len(table.schema), table_id
+            # dataframe.to_csv("sheesh.csv")
+
+
+        job_config = bigquery.LoadJobConfig(
+                write_disposition="WRITE_TRUNCATE",
             )
-        )
 
-except Exception as e:
-    print(e)
+        job = client.load_table_from_dataframe(    
+                dataframe, table_id,job_config=job_config
+        )  # Make an API request.
+        job.result()  # Wait for the job to complete.
 
+        table = client.get_table(table_id)  # Make an API request.
+        print(
+                "Loaded {} rows and {} columns to {}".format(
+                    table.num_rows, len(table.schema), table_id
+                )
+            )
+
+    except Exception as e:
+        print(e)
+
+while True:
+    loadEmails()
+    for i in range(1 * 3 * 60 ,0,-1):
+        print(f"{int(i/60)}minutes and {i%60} seconds", end="\r", flush=True)
+        time.sleep(1)
+    
