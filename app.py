@@ -71,6 +71,7 @@ def loadEmails():
 
 while True:
     loadEmails()
+    print("Emails are loaded")
     for i in range(1 * 3 * 60 ,0,-1):
         print(f"{int(i/60)}minutes and {i%60} seconds", end="\r", flush=True)
         time.sleep(1)
