@@ -2,7 +2,7 @@
 from google.cloud import bigquery
 import pandas
 import os
-from Messages import getMessages, columns
+from Messages import getMessages, columns, getNumberOfMessages
 from dotenv import load_dotenv
 import json
 import time
@@ -24,7 +24,7 @@ with open("creds.json", "w") as outfile:
     json.dump(CREDENTIALS, outfile)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "creds.json"
 
-def loadEmails():
+def loadEmails(n_start, n_end):
     try:
         client = bigquery.Client()
         # TODO(developer): Set table_id to the ID of the table to create.
@@ -34,7 +34,8 @@ def loadEmails():
         adjustedColumns = [i.replace("-", "") for i in columns]
         adjustedColumns.append("MessageText")
         # print(adjustedColumns)
-        records = getMessages()
+        records = []
+        getMessages(n_start, n_end,records)
         dataframe = pandas.DataFrame(
                 records,
                 columns=adjustedColumns,
@@ -45,10 +46,18 @@ def loadEmails():
         job_config = bigquery.LoadJobConfig(
                 write_disposition="WRITE_TRUNCATE",
             )
-        job = client.load_table_from_dataframe(    
-                dataframe, table_id,job_config=job_config
-        )  # Make an API request.
-        job.result()  # Wait for the job to complete.
+
+        if n_start == 0:
+
+            job = client.load_table_from_dataframe(    
+                    dataframe, table_id,job_config=job_config
+            )  # Make an API request.
+            job.result()  # Wait for the job to complete.
+        else:
+            job = client.load_table_from_dataframe(    
+                    dataframe, table_id
+            )  # Make an API request.
+            job.result()  # Wait for the job to complete.
         table = client.get_table(table_id)  # Make an API request.
         print(
                 "Loaded {} rows and {} columns to {}".format(
@@ -58,12 +67,14 @@ def loadEmails():
 
     except Exception as e:
         print(e)
+n=1000
+for i in range(getNumberOfMessages()//n):
+    try: 
+        loadEmails(i*n, (i+1) * n)
+    except Exception as e: 
+        print(e)
+print("Got all the Messages")
 
-
-try: 
-    loadEmails()
-except Exception as e: 
-    print(e)
 
 # while True:
 #     loadEmails()

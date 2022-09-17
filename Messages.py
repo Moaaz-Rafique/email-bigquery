@@ -58,9 +58,30 @@ def clean(text):
 N = 1000
 
 # create an IMAP4 class with SSL, use your email provider's IMAP server
+def getNumberOfMessages():
+    imap = imaplib.IMAP4_SSL(imap_server)
+    # authenticate    
+    try:
+        imap.login(username, password)
+    except Exception as e:
+        print(e)
+        return
+        # sys.exit(1)
 
-@profile
-def getMessages():
+    # use imap.list() to get the list of mailboxes
+    
+    # for i in imap.list()[1]:
+    #     print(i)
+    # return
+    status, messages = imap.select("INBOX")
+
+    # total number of emails
+    messages = int(messages[0])
+
+    print("No of Messages: ",messages)
+    return messages
+# @profile
+def getMessages(n_start, n_end, records):
     # select a mailbox (in this case, the inbox mailbox)
     imap = imaplib.IMAP4_SSL(imap_server)
     # authenticate    
@@ -73,17 +94,17 @@ def getMessages():
 
     # use imap.list() to get the list of mailboxes
     
-    for i in imap.list()[1]:
-        print(i)
+    # for i in imap.list()[1]:
+    #     print(i)
     # return
     status, messages = imap.select("INBOX")
 
     # total number of emails
-    messages = int(messages[0])
+    # messages = int(messages[0])
 
     print("No of Messages: ",messages)
-    records = []
-    for i in range(messages, 0, -1):    
+    # records = []
+    for i in range(messages-n_start, messages-n_end, -1):    
         res, msg = imap.fetch(str(i), '(BODY.PEEK[])')
         print("Getting messages no: ",messages-i)
         
@@ -159,9 +180,9 @@ def getMessages():
 
     imap.close()
     imap.logout()
-    print("Total size",sys.getsizeof(records))
-    print("Got all the Messages")
-    return records
+    # print("Total size",sys.getsizeof(records))
+    # print("Got all the Messages")
+    # return records
 # try:
 #     (getMessages())
 # except Exception as e:
