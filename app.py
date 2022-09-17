@@ -33,7 +33,7 @@ def loadEmails():
 
         adjustedColumns = [i.replace("-", "") for i in columns]
         adjustedColumns.append("MessageText")
-        print(adjustedColumns)
+        # print(adjustedColumns)
         records = getMessages()
         dataframe = pandas.DataFrame(
                 records,
