@@ -47,25 +47,18 @@ def loadEmails(n_start, n_end):
                 write_disposition="WRITE_TRUNCATE",
             )
 
-        try:
-
-            if n_start == 0:
-                try:
-                    job = client.load_table_from_dataframe(    
-                            dataframe, table_id,job_config=job_config
-                    )  # Make an API request.
-                    job.result()  # Wait for the job to complete.
-                except :
-                    print("Error")
-            else:
-                
-                job = client.load_table_from_dataframe(    
-                        dataframe, table_id
-                )  # Make an API request.
-                job.result()  # Wait for the job to complete.
-        except Exception as e:
-            print("Error Uploading")
-            print(e)
+        
+        if n_start == 0:
+            job = client.load_table_from_dataframe(    
+                    dataframe, table_id,job_config=job_config
+            )  # Make an API request.
+            job.result()  # Wait for the job to complete.
+        else:
+            
+            job = client.load_table_from_dataframe(    
+                    dataframe, table_id
+            )  # Make an API request.
+            job.result()  # Wait for the job to complete.
         table = client.get_table(table_id)  # Make an API request.
         print(
                 "Loaded {} rows and {} columns to {}".format(
@@ -80,6 +73,7 @@ for i in range(getNumberOfMessages()//n):
     try: 
         loadEmails(i*n, (i+1) * n)
     except Exception as e: 
+        print("=====Load Emails was unsuccessful=====")
         print(e)
 print("Got all the Messages")
 
