@@ -50,10 +50,13 @@ def loadEmails(n_start, n_end):
         try:
 
             if n_start == 0:
-                job = client.load_table_from_dataframe(    
-                        dataframe, table_id,job_config=job_config
-                )  # Make an API request.
-                job.result()  # Wait for the job to complete.
+                try:
+                    job = client.load_table_from_dataframe(    
+                            dataframe, table_id,job_config=job_config
+                    )  # Make an API request.
+                    job.result()  # Wait for the job to complete.
+                except :
+                    print("Error")
             else:
                 
                 job = client.load_table_from_dataframe(    
