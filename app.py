@@ -60,12 +60,15 @@ def loadEmails():
         print(e)
 
 
-# loadEmails()
-
-while True:
+try: 
     loadEmails()
-    print("Emails are loaded")
-    for i in range(1 * 60 * 60 ,0,-1):
-        print(f"{int(i/60)} minutes and {i%60} seconds")
-        time.sleep(1)
+except Exception as e: 
+    print(e)
+
+# while True:
+#     loadEmails()
+#     print("Emails are loaded")
+#     for i in range(1 * 60 * 60 ,0,-1):
+#         print(f"{int(i/60)} minutes and {i%60} seconds")
+#         time.sleep(1)
     
