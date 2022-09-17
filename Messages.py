@@ -100,9 +100,9 @@ def getMessages(n_start, n_end, records):
     status, messages = imap.select("INBOX")
 
     # total number of emails
-    # messages = int(messages[0])
+    messages = int(messages[0])
 
-    print("No of Messages: ",messages)
+    # print("No of Messages: ",messages)
     # records = []
     for i in range(messages-n_start, messages-n_end, -1):    
         res, msg = imap.fetch(str(i), '(BODY.PEEK[])')
