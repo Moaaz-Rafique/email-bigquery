@@ -67,7 +67,7 @@ def loadEmails(n_start, n_end):
 
     except Exception as e:
         print(e)
-n=1000
+n=1
 for i in range(getNumberOfMessages()//n):
     try: 
         loadEmails(i*n, (i+1) * n)
