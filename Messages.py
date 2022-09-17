@@ -55,7 +55,7 @@ def clean(text):
     return "".join(c if c.isalnum() else "_" for c in text)
 
 # number of top emails to fetch
-N = 10000
+N = 1000
 
 # create an IMAP4 class with SSL, use your email provider's IMAP server
 
@@ -83,7 +83,7 @@ def getMessages():
 
     print("No of Messages: ",messages)
     records = []
-    for i in range(messages, messages-N, -1):    
+    for i in range(messages, 0, -1):    
         res, msg = imap.fetch(str(i), '(BODY.PEEK[])')
         print("Getting messages no: ",messages-i)
         
