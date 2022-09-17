@@ -19,7 +19,7 @@ CREDENTIALS = {
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": os.getenv("CLIENT_X509_CERT_URL")
 }
-
+print(CREDENTIALS)
 with open("creds.json", "w") as outfile:
     json.dump(CREDENTIALS, outfile)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "creds.json"
