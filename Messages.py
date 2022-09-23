@@ -142,16 +142,22 @@ def getMessages(n_start, n_end, records):
                             if content_type == "text/plain" and "attachment" not in content_disposition:
                                 ("printing part ")
                             elif "attachment" in content_disposition:
-                                recordText+=part.get_payload(decode=True)
+                                try:
+                                    recordText+=part.get_payload(decode=True)
+                                except Exception as e:
+                                    print(e)
+                                    print("loading other parts...")
+
+
                             elif content_type == "text/html":
-                                soup = BeautifulSoup(part.get_payload(), features="html.parser")
+                                soup = BeautifulSoup(part.get_payload(decode=True), features="html.parser")
                                 for script in soup(["script", "style"]):
                                     script.extract()
                                 text = soup.get_text()                            
                                 lines = (line.strip() for line in text.splitlines())                            
                                 chunks = (phrase.strip() for line in lines for phrase in line.split("  "))                            
-                                text = '\n'.join(chunk for chunk in chunks if chunk)  
                                 try:
+                                    text = '\n'.join(chunk for chunk in chunks if chunk)  
                                     if isinstance(text, str):
                                         recordText+=text
                                     else:
@@ -181,7 +187,7 @@ def getMessages(n_start, n_end, records):
                     record['Day'] = record["Date"][0:3]
                     record['ShortDate'] = record["Date"][5:16]
                     record["MessageText"] = recordText                    
-                    record["Subject"] = email.header.decode_header(record["Subject"])[0][0]
+                    # record["Subject"] = email.header.decode_header(record["Subject"])[0][0]
                     records.append(record)
 
                     # print(record["Subject"])
@@ -191,7 +197,9 @@ def getMessages(n_start, n_end, records):
                 print("Imap is aborted")
                 break
             except Exception as e:
-                print(e)    
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)   
                 # imap.login(username, password)
                 print(sys.getsizeof(records))
             # print("="*100)
@@ -201,8 +209,8 @@ def getMessages(n_start, n_end, records):
     # print("Total size",sys.getsizeof(records))
     # print("Got all the Messages")
     # return records
-# try:
-#     (getMessages(7,9, []))
-# except Exception as e:
-#     print(e)
+try:
+    (getMessages(0,9, []))
+except Exception as e:
+    print(e)
 # print(getMessages)
