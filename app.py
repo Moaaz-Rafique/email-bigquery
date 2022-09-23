@@ -69,21 +69,28 @@ def loadEmails(n_start, n_end):
     except Exception as e:
         print("upload table error")
         print(e)
-n=10
+n=10000
+t = getNumberOfMessages()
 while True:
-    for i in range(getNumberOfMessages()//n):
+    for i in range(t//n):
         try: 
             loadEmails(i*n, (i+1) * n)
         except Exception as e: 
-            print("=====Load Emails was unsuccessful=====")
+            print("=====Loading Emails was unsuccessful=====")
             print(e)
+    try:
+        loadEmails(t//n*n,t)
+    except Exception as e: 
+        print("=====Loading Emails was unsuccessful=====")
+        print(e)
     print("Got all the Messages")
+
 # while True:
     # loadEmails()
-    print("Emails are loaded")
-    for i in range(10 * 60 * 60 ,0,-1):
-        print(f"{int(i/60)} minutes and {i%60} seconds")
-        time.sleep(1)
+    # print("Emails are loaded")
+    # for i in range(10 * 60 * 60 ,0,-1):
+    #     print(f"{int(i/60)} minutes and {i%60} seconds")
+    #     time.sleep(1)
 
 
     
