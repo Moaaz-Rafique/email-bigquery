@@ -151,10 +151,14 @@ def getMessages(n_start, n_end, records):
                                 lines = (line.strip() for line in text.splitlines())                            
                                 chunks = (phrase.strip() for line in lines for phrase in line.split("  "))                            
                                 text = '\n'.join(chunk for chunk in chunks if chunk)  
-                                if isinstance(text, str):
-                                    recordText+=text
-                                else:
-                                    print("Some data was not decoded properly")
+                                try:
+                                    if isinstance(text, str):
+                                        recordText+=text
+                                    else:
+                                        print("Some data was not decoded properly")
+                                except Exception as e:
+                                    print(e)
+                                    print("Error in decoding")
                                     # recordText+=text.__str__()
                             elif  content_type == "text/plain":
                                 recordText+=part.get_payload(decode=True)
@@ -176,7 +180,7 @@ def getMessages(n_start, n_end, records):
                     record['Time'] = record["Date"][16:25]
                     record['Day'] = record["Date"][0:3]
                     record['ShortDate'] = record["Date"][5:16]
-                    record["MessageText"] = recordText.replace('\n', '\r\n')
+                    record["MessageText"] = recordText                    
                     record["Subject"] = email.header.decode_header(record["Subject"])[0][0]
                     records.append(record)
 
