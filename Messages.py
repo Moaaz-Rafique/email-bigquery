@@ -8,6 +8,12 @@ import sys
 from memory_profiler import profile
 load_dotenv()
 
+import email.header
+
+def decode_mime_words(s):
+    return u''.join(
+        word.decode(encoding or 'utf8') if isinstance(word, bytes) else word
+        for word, encoding in email.header.decode_header(s))
 
 # account credentials
 username = os.getenv("EMAIL")
@@ -118,9 +124,9 @@ def getMessages(n_start, n_end, records):
                     for j in columns:
                         if isinstance(msg[j], str):         
                             
-                            record[j.replace("-", "")] = msg[j]
+                            record[j.replace("-", "")] = email.header.decode_header(msg[j])[0][0]
                         elif msg[j]:
-                            record[j.replace("-", "")] = msg[j].as_string()
+                            record[j.replace("-", "")] = email.header.decode_header(msg[j].__str__())[0][0]
                         else:
                             record[j.replace("-", "")] = ""
                         # print(j.replace("-", "")+": ", record[j.replace("-", "")])
@@ -144,8 +150,12 @@ def getMessages(n_start, n_end, records):
                                 text = soup.get_text()                            
                                 lines = (line.strip() for line in text.splitlines())                            
                                 chunks = (phrase.strip() for line in lines for phrase in line.split("  "))                            
-                                text = '\n'.join(chunk for chunk in chunks if chunk)                            
-                                recordText+=text
+                                text = '\n'.join(chunk for chunk in chunks if chunk)  
+                                if isinstance(text, str):
+                                    recordText+=text
+                                else:
+                                    print("Some data was not decoded properly")
+                                    # recordText+=text.__str__()
                             elif  content_type == "text/plain":
                                 recordText+=part.get_payload(decode=True)
                         # print("="*100)            
@@ -159,15 +169,19 @@ def getMessages(n_start, n_end, records):
                             lines = (line.strip() for line in text.splitlines())                            
                             chunks = (phrase.strip() for line in lines for phrase in line.split("  "))                            
                             text = '\n'.join(chunk for chunk in chunks if chunk)
-                            recordText+=text
+                            recordText+=text.replace('\n', '\r\n')
                         except Exception as e:
                             print(e)        
                     # print(recordText)
                     record['Time'] = record["Date"][16:25]
                     record['Day'] = record["Date"][0:3]
                     record['ShortDate'] = record["Date"][5:16]
-                    record["MessageText"] = recordText
+                    record["MessageText"] = recordText.replace('\n', '\r\n')
+                    record["Subject"] = email.header.decode_header(record["Subject"])[0][0]
                     records.append(record)
+
+                    # print(record["Subject"])
+
             except imap.abort:
                 # imap.login(username, password)
                 print("Imap is aborted")
@@ -184,7 +198,7 @@ def getMessages(n_start, n_end, records):
     # print("Got all the Messages")
     # return records
 # try:
-#     (getMessages())
+#     (getMessages(7,9, []))
 # except Exception as e:
 #     print(e)
 # print(getMessages)
