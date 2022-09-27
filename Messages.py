@@ -208,9 +208,9 @@ def getMessages(n_start, n_end, records):
     imap.logout()
     # print("Total size",sys.getsizeof(records))
     # print("Got all the Messages")
-    # return records
-try:
-    (getMessages(0,9, []))
-except Exception as e:
-    print(e)
+    return records
+# try:
+#     print(getMessages(0,1, []))
+# except Exception as e:
+#     print(e)
 # print(getMessages)

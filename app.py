@@ -44,7 +44,7 @@ def loadEmails(n_start, n_end):
             # print(dataframe.columns)
             # dataframe.to_csv("sheesh.csv")
         job_config = bigquery.LoadJobConfig(
-                write_disposition="WRITE_TRUNCATE",
+                # write_disposition="WRITE_TRUNCATE",
             )
 
         
@@ -84,13 +84,9 @@ while True:
         print("=====Loading Emails was unsuccessful=====")
         print(e)
     print("Got all the Messages")
-
-# while True:
-    # loadEmails()
-    # print("Emails are loaded")
-    # for i in range(10 * 60 * 60 ,0,-1):
-    #     print(f"{int(i/60)} minutes and {i%60} seconds")
-    #     time.sleep(1)
+    for i in range( * 60 * 60 ,0,-1):
+        print(f"{int(i/60)} minutes and {i%60} seconds")
+        time.sleep(1)
 
 
     
